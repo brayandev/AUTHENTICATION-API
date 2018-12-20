@@ -1,10 +1,14 @@
 package authentication
 
-import "context"
+import (
+	"context"
+
+	"gopkg.in/mgo.v2/bson"
+)
 
 // Service ...
 type Service interface {
-	Save(ctx context.Context, user *User) (*UserInserted, error)
+	Save(ctx context.Context, user User) (*UserInserted, error)
 }
 
 // ServiceImpl ...
@@ -12,19 +16,10 @@ type ServiceImpl struct {
 	repository Repository
 }
 
-// ParamUser ...
-type ParamUser struct {
-	ID       string `bson:"_id" json:"id"`
-	Login    string `bson:"user" json:"user"`
-	Password string `bson:"password" json:"password"`
-	Name     string `bson:"name" json:"name"`
-	Email    string `bson:"email" json:"email"`
-	TypeUser string `bson:"typeUser" json:"typeUser"`
-}
-
 // UserInserted ...
 type UserInserted struct {
-	ID       string `json:"id"`
+	Login    string `json:"login"`
+	Email    string `json:"email"`
 	Name     string `json:"name"`
 	TypeUser string `json:"typeUser"`
 }
@@ -40,24 +35,27 @@ func NewService(repository Repository) *ServiceImpl {
 }
 
 // Save ...
-func (s *ServiceImpl) Save(ctx context.Context, paramUser *ParamUser) (*UserInserted, error) {
-	user := User{
-		ID:       paramUser.ID,
-		Login:    paramUser.Login,
-		Password: paramUser.Password,
-		Name:     paramUser.Name,
-		Email:    paramUser.Email,
-		TypeUser: paramUser.TypeUser,
+func (s *ServiceImpl) Save(ctx context.Context, user User) (*UserInserted, error) {
+	user = User{
+		Login:    user.Login,
+		Password: user.Password,
+		Name:     user.Name,
+		Email:    user.Email,
+		TypeUser: user.TypeUser,
 	}
+	user.ID = bson.NewObjectId()
+
 	err := s.repository.save(user)
 	if err != nil {
 		return nil, err
 	}
 
 	userInserted := &UserInserted{
-		ID:       user.ID,
+		Login:    user.Login,
+		Email:    user.Email,
 		Name:     user.Name,
 		TypeUser: user.TypeUser,
 	}
+
 	return userInserted, nil
 }
