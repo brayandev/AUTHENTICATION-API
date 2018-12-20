@@ -1,14 +1,10 @@
 package authentication
 
 import (
+	"errors"
 	"os"
 
 	mgo "gopkg.in/mgo.v2"
-)
-
-const (
-	collection = "User"
-	database   = "CourseDB"
 )
 
 // Repository ...
@@ -19,8 +15,7 @@ type Repository interface {
 
 // RepositoryImpl ...
 type RepositoryImpl struct {
-	collectionName string
-	session        *mgo.Session
+	session *mgo.Session
 }
 
 // Session ...
@@ -30,23 +25,24 @@ type Session struct {
 }
 
 // NewRepository ...
-func NewRepository(collectionName string, session *mgo.Session) *RepositoryImpl {
+func NewRepository(session *mgo.Session) *RepositoryImpl {
 	return &RepositoryImpl{
-		collectionName: collectionName,
-		session:        session,
+		session: session,
 	}
 }
 
 // NewMongoDB ...
 func NewMongoDB(endpoint string) (*mgo.Session, error) {
-	session, err := mgo.Dial(endpoint)
-	if err != nil {
-		return nil, err
+	var mgoSession *mgo.Session
+	if mgoSession == nil {
+		var err error
+		mgoSession, err = mgo.Dial(endpoint)
+		if err != nil {
+			return nil, errors.New("Failed to start the mongo session")
+		}
 	}
-	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
 
-	return session, err
+	return mgoSession.Clone(), nil
 }
 
 // Save ...
@@ -55,7 +51,7 @@ func (r *RepositoryImpl) save(user User) error {
 	if err != nil {
 		return err
 	}
-	c := session.DB(database).C(collection)
+	c := session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
 	return c.Insert(user)
 }
 
