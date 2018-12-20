@@ -56,7 +56,7 @@ func errorWrapper(fn handlerFuncError) func(http.ResponseWriter, *http.Request) 
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := fn(w, r)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}
 }

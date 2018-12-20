@@ -6,6 +6,11 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+const (
+	student typeUser = "student"
+	teacher typeUser = "teacher"
+)
+
 // Service ...
 type Service interface {
 	Save(ctx context.Context, user User) (*UserInserted, error)
