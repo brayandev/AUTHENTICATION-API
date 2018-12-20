@@ -13,7 +13,7 @@ type Repository interface {
 	save(user User) error
 }
 
-// RepositoryImpl ...
+// RepositoryImpl implements repository...
 type RepositoryImpl struct {
 	session *mgo.Session
 }
