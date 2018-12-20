@@ -7,7 +7,7 @@ import (
 	mgo "gopkg.in/mgo.v2"
 )
 
-// Repository is repository...
+// Repository ...
 type Repository interface {
 	authentication(Login, Password string) error
 	save(user User) error
