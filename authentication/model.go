@@ -2,7 +2,7 @@ package authentication
 
 import "gopkg.in/mgo.v2/bson"
 
-// User ...
+// User test user...
 type User struct {
 	ID       bson.ObjectId `bson:"_id" json:"id"`
 	Login    string        `bson:"login" json:"login"`
