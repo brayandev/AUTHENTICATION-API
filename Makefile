@@ -38,8 +38,8 @@ build: build-authentication-api
 ## build-authentication-api: build authentication api.
 build-authentication-api: 
 	@echo $(ECHOFLAGS) "$(OK_COLOR)==> Building binary... (linux/$(BUILDARCH)/$(BIN_API_AUTHENTICATION))...$(NO_COLOR)"
-	@echo $(ECHOFLAGS) $(ENVFLAGS) GOOS=linux GOARCH=$(BUILDARCH) $(GO) build $(BUILDFLAGS) -o bin/linux/amd64/$(BIN_API_AUTHENTICATION) ./cmd/authentication-api
-	@$(ENVFLAGS) GOOS=linux GOARCH=$(BUILDARCH) $(GO) build $(BUILDFLAGS) -o bin/linux_amd64/$(BIN_API_AUTHENTICATION) ./cmd/authentication-api
+	@echo $(ECHOFLAGS) $(ENVFLAGS) GOOS=linux GOARCH=$(BUILDARCH) $(GO) build $(BUILDFLAGS) -o bin/linux/amd64/$(BIN_API_AUTHENTICATION) ./cmd/not-name
+	@$(ENVFLAGS) GOOS=linux GOARCH=$(BUILDARCH) $(GO) build $(BUILDFLAGS) -o bin/linux_amd64/$(BIN_API_AUTHENTICATION) ./cmd/not-name
 
 ## test: run unit tests
 test: 
