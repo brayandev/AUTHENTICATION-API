@@ -41,8 +41,3 @@ func (s *ServiceImpl) SaveStudent(ctx context.Context, student Student) (string,
 func (s *ServiceImpl) GetStudent(ctx context.Context, id string) (*Student, error) {
 	return s.repository.get(ctx, id)
 }
-
-// DeleteStudent ...
-// func (s *ServiceImpl) DeleteStudent(ctx context.Context, id string) error {
-// 	return s.repository.delete(ctx, id)
-// }
