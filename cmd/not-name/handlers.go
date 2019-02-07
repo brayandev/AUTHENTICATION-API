@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/authentication-api/authentication"
@@ -11,14 +12,14 @@ import (
 
 type handlerFuncError func(w http.ResponseWriter, r *http.Request) error
 
-func addNewUser(svc authentication.Service) handlerFuncError {
+func addNewUser(service authentication.Service) handlerFuncError {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var user authentication.User
 		err := json.NewDecoder(r.Body).Decode(&user)
 		if err != nil {
 			return err
 		}
-		userInserted, err := svc.Save(context.TODO(), &user)
+		userInserted, err := service.Save(context.TODO(), user)
 		if err != nil {
 			return err
 		}
@@ -50,4 +51,13 @@ func responseWriter(w http.ResponseWriter, code int, content versionable) error 
 		return err
 	}
 	return nil
+}
+
+func errorWrapper(fn handlerFuncError) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := fn(w, r)
+		if err != nil {
+			log.Println(err)
+		}
+	}
 }

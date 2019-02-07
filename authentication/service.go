@@ -1,10 +1,15 @@
 package authentication
 
-import "context"
+import (
+	"context"
+
+	"github.com/gofrs/uuid"
+)
 
 // Service ...
 type Service interface {
-	Save(ctx context.Context, user *User) (*UserInserted, error)
+	SaveStudent(ctx context.Context, student Student) (string, error)
+	GetStudent(ctx context.Context, id string) (*Student, error)
 }
 
 // ServiceImpl ...
@@ -12,52 +17,27 @@ type ServiceImpl struct {
 	repository Repository
 }
 
-// ParamUser ...
-type ParamUser struct {
-	ID       string `bson:"_id" json:"id"`
-	Login    string `bson:"user" json:"user"`
-	Password string `bson:"password" json:"password"`
-	Name     string `bson:"name" json:"name"`
-	Email    string `bson:"email" json:"email"`
-	TypeUser string `bson:"typeUser" json:"typeUser"`
-}
-
-// UserInserted ...
-type UserInserted struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	TypeUser string `json:"typeUser"`
-}
-
-// Version ...
-func (UserInserted) Version() string {
-	return "" //TODO version
-}
-
 // NewService ...
 func NewService(repository Repository) *ServiceImpl {
 	return &ServiceImpl{repository: repository}
 }
 
-// Save ...
-func (s *ServiceImpl) Save(ctx context.Context, paramUser *ParamUser) (*UserInserted, error) {
-	user := User{
-		ID:       paramUser.ID,
-		Login:    paramUser.Login,
-		Password: paramUser.Password,
-		Name:     paramUser.Name,
-		Email:    paramUser.Email,
-		TypeUser: paramUser.TypeUser,
-	}
-	err := s.repository.save(user)
+// SaveStudent ...
+func (s *ServiceImpl) SaveStudent(ctx context.Context, student Student) (string, error) {
+	studentID, err := uuid.NewV4()
 	if err != nil {
-		return nil, err
+		return "", err
+	}
+	student.ID = studentID.String()
+	err = s.repository.save(ctx, student)
+	if err != nil {
+		return "", err
 	}
 
-	userInserted := &UserInserted{
-		ID:       user.ID,
-		Name:     user.Name,
-		TypeUser: user.TypeUser,
-	}
-	return userInserted, nil
+	return student.ID, nil
+}
+
+// GetStudent ...
+func (s *ServiceImpl) GetStudent(ctx context.Context, id string) (*Student, error) {
+	return s.repository.get(ctx, id)
 }
