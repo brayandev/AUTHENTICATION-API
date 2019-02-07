@@ -3,17 +3,13 @@ package authentication
 import (
 	"context"
 
-	"gopkg.in/mgo.v2/bson"
-)
-
-const (
-	student typeUser = "student"
-	teacher typeUser = "teacher"
+	"github.com/gofrs/uuid"
 )
 
 // Service ...
 type Service interface {
-	Save(ctx context.Context, user User) (*UserInserted, error)
+	SaveStudent(ctx context.Context, student Student) (string, error)
+	GetStudent(ctx context.Context, id string) (*Student, error)
 }
 
 // ServiceImpl ...
@@ -21,46 +17,32 @@ type ServiceImpl struct {
 	repository Repository
 }
 
-// UserInserted ...
-type UserInserted struct {
-	Login    string `json:"login"`
-	Email    string `json:"email"`
-	Name     string `json:"name"`
-	TypeUser string `json:"typeUser"`
-}
-
-// Version ...
-func (UserInserted) Version() string {
-	return "" //TODO version
-}
-
 // NewService ...
 func NewService(repository Repository) *ServiceImpl {
 	return &ServiceImpl{repository: repository}
 }
 
-// Save ...
-func (s *ServiceImpl) Save(ctx context.Context, user User) (*UserInserted, error) {
-	user = User{
-		Login:    user.Login,
-		Password: user.Password,
-		Name:     user.Name,
-		Email:    user.Email,
-		TypeUser: user.TypeUser,
-	}
-	user.ID = bson.NewObjectId()
-
-	err := s.repository.save(user)
+// SaveStudent ...
+func (s *ServiceImpl) SaveStudent(ctx context.Context, student Student) (string, error) {
+	studentID, err := uuid.NewV4()
 	if err != nil {
-		return nil, err
+		return "", err
+	}
+	student.ID = studentID.String()
+	err = s.repository.save(ctx, student)
+	if err != nil {
+		return "", err
 	}
 
-	userInserted := &UserInserted{
-		Login:    user.Login,
-		Email:    user.Email,
-		Name:     user.Name,
-		TypeUser: user.TypeUser,
-	}
-
-	return userInserted, nil
+	return student.ID, nil
 }
+
+// GetStudent ...
+func (s *ServiceImpl) GetStudent(ctx context.Context, id string) (*Student, error) {
+	return s.repository.get(ctx, id)
+}
+
+// DeleteStudent ...
+// func (s *ServiceImpl) DeleteStudent(ctx context.Context, id string) error {
+// 	return s.repository.delete(ctx, id)
+// }

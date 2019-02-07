@@ -1,15 +1,15 @@
 package authentication
 
-import "gopkg.in/mgo.v2/bson"
-
-// User is structure to persist user ...
-type User struct {
-	ID       bson.ObjectId `bson:"_id" json:"id"`
-	Login    string        `bson:"login" json:"login"`
-	Password string        `bson:"password" json:"password"`
-	Name     string        `bson:"name" json:"name"`
-	Email    string        `bson:"email" json:"email"`
-	TypeUser string        `bson:"typeUser" json:"typeUser"`
+// Student is structure to persist a student...
+type Student struct {
+	ID       string `bson:"studentID" json:"studentID"`
+	Login    string `bson:"login" json:"login"`
+	Password string `bson:"password" json:"password"`
+	Name     string `bson:"name" json:"name"`
+	Email    string `bson:"email" json:"email"`
 }
 
-type typeUser string
+// Version ...
+func (s *Student) Version() string {
+	return "vnd.authentication-student.student.v1"
+}
