@@ -2,7 +2,7 @@ package authentication
 
 // Student is structure to persist a student...
 type Student struct {
-	ID       string `bson:"studentID" json:"studentID"`
+	ID       string `bson:"studentId" json:"studentId"`
 	Login    string `bson:"login" json:"login"`
 	Password string `bson:"password" json:"password"`
 	Name     string `bson:"name" json:"name"`

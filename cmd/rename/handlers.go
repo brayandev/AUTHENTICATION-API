@@ -14,7 +14,7 @@ import (
 
 type handlerFuncError func(w http.ResponseWriter, r *http.Request) error
 
-func addNewStudent(service authentication.Service) handlerFuncError {
+func saveStudent(service authentication.Service) handlerFuncError {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var student authentication.Student
 		err := json.NewDecoder(r.Body).Decode(&student)
@@ -40,16 +40,16 @@ func getStudent(service authentication.Service) handlerFuncError {
 	}
 }
 
-// func deleteStudent(service authentication.Service) handlerFuncError {
-// 	return func(w http.ResponseWriter, r *http.Request) error {
-// 		studentID := chi.URLParam(r, "studentID")
-// 		err := service.DeleteStudent(context.TODO(), studentID)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		return responseWriter(w, http.StatusNoContent, nil)
-// 	}
-// }
+func deleteStudent(service authentication.Service) handlerFuncError {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		studentID := chi.URLParam(r, "studentID")
+		err := service.DeleteStudent(context.TODO(), studentID)
+		if err != nil {
+			return err
+		}
+		return responseWriter(w, http.StatusNoContent, nil)
+	}
+}
 
 func responseWriter(w http.ResponseWriter, code int, content Versionable) error {
 	if content == nil {

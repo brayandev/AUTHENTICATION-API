@@ -17,8 +17,9 @@ func createServerHandler() (http.Handler, error) {
 	service := authentication.NewService(repository)
 	router := chi.NewRouter()
 	router.Route("/students", func(router chi.Router) {
-		router.Put("/", errorWrapper(addNewStudent(service)))
+		router.Put("/", errorWrapper(saveStudent(service)))
 		router.Get("/{studentID}", errorWrapper(getStudent(service)))
+		router.Delete("/{studentID}", errorWrapper(deleteStudent(service)))
 	})
 	return router, nil
 }

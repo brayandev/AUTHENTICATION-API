@@ -2,7 +2,6 @@ package authentication
 
 import (
 	"context"
-	"errors"
 	"os"
 
 	"github.com/mongodb/mongo-go-driver/bson"
@@ -15,6 +14,7 @@ type Repository interface {
 	authentication(Login, Password string) error
 	save(ctx context.Context, student Student) error
 	get(ctx context.Context, id string) (*Student, error)
+	delete(ctx context.Context, id string) error
 }
 
 // RepositoryImpl implements repository...
@@ -42,14 +42,13 @@ func NewMongoDB(endpoint string) (*mgo.Session, error) {
 		var err error
 		mgoSession, err = mgo.Dial(endpoint)
 		if err != nil {
-			return nil, errors.New("Failed to start the mongo session")
+			return nil, err
 		}
 	}
 
 	return mgoSession.Clone(), nil
 }
 
-// Save ...
 func (r *RepositoryImpl) save(ctx context.Context, student Student) error {
 	session, err := NewMongoDB(os.Getenv("HOST_MONGODB"))
 	if err != nil {
@@ -66,11 +65,24 @@ func (r *RepositoryImpl) get(ctx context.Context, id string) (*Student, error) {
 	}
 	c := session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
 	var student Student
-	err := c.Find(bson.M{"studentID": id}).One(&student)
+	err := c.Find(bson.M{"studentId": id}).One(&student)
 	if err != nil {
 		return nil, err
 	}
 	return &student, nil
+}
+
+func (r *RepositoryImpl) delete(ctx context.Context, id string) error {
+	session, cErr := NewMongoDB(os.Getenv("HOST_MONGODB"))
+	if cErr != nil {
+		return cErr
+	}
+	c := session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
+	err := c.Remove(bson.M{"studentId": id})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Authentication ...

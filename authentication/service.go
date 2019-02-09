@@ -10,6 +10,7 @@ import (
 type Service interface {
 	SaveStudent(ctx context.Context, student Student) (string, error)
 	GetStudent(ctx context.Context, id string) (*Student, error)
+	DeleteStudent(ctx context.Context, id string) error
 }
 
 // ServiceImpl ...
@@ -40,4 +41,9 @@ func (s *ServiceImpl) SaveStudent(ctx context.Context, student Student) (string,
 // GetStudent ...
 func (s *ServiceImpl) GetStudent(ctx context.Context, id string) (*Student, error) {
 	return s.repository.get(ctx, id)
+}
+
+// DeleteStudent ...
+func (s *ServiceImpl) DeleteStudent(ctx context.Context, id string) error {
+	return s.repository.delete(ctx, id)
 }
