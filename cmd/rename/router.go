@@ -6,15 +6,14 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/student-api/student"
 	"go.uber.org/zap"
-	mgo "gopkg.in/mgo.v2"
 )
 
-func createServerHandler(service student.Service, logger *zap.Logger, session *mgo.Session) (http.Handler, error) {
+func createServerHandler(service student.Service, logger *zap.Logger) (http.Handler, error) {
 	router := chi.NewRouter()
 	router.Route("/students", func(router chi.Router) {
-		router.Put("/", errorWrapper(saveStudent(service, session)))
-		router.Get("/{studentId}", errorWrapper(getStudent(service, session)))
-		router.Delete("/{studentId}", errorWrapper(deleteStudent(service, session)))
+		router.Put("/", errorWrapper(saveStudent(service)))
+		router.Get("/{studentId}", errorWrapper(getStudent(service)))
+		router.Delete("/{studentId}", errorWrapper(deleteStudent(service)))
 	})
 	return router, nil
 }

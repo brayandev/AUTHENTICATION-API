@@ -16,9 +16,9 @@ const (
 // Repository is repository ...
 type Repository interface {
 	authentication(Login, Password string) error
-	save(ctx context.Context, student Student, session *mgo.Session) error
-	get(ctx context.Context, id string, session *mgo.Session) (*Student, error)
-	delete(ctx context.Context, id string, session *mgo.Session) error
+	save(ctx context.Context, student Student) error
+	get(ctx context.Context, id string) (*Student, error)
+	delete(ctx context.Context, id string) error
 }
 
 // RepositoryImpl implements repository...
@@ -53,13 +53,13 @@ func NewMongoDB(endpoint string) (*mgo.Session, error) {
 	return mgoSession.Clone(), nil
 }
 
-func (r *RepositoryImpl) save(ctx context.Context, student Student, session *mgo.Session) error {
-	c := session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
+func (r *RepositoryImpl) save(ctx context.Context, student Student) error {
+	c := r.session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
 	return c.Insert(student)
 }
 
-func (r *RepositoryImpl) get(ctx context.Context, id string, session *mgo.Session) (*Student, error) {
-	c := session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
+func (r *RepositoryImpl) get(ctx context.Context, id string) (*Student, error) {
+	c := r.session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
 	var student Student
 	err := c.Find(bson.M{studentID: id}).One(&student)
 	if err != nil {
@@ -68,8 +68,8 @@ func (r *RepositoryImpl) get(ctx context.Context, id string, session *mgo.Sessio
 	return &student, nil
 }
 
-func (r *RepositoryImpl) delete(ctx context.Context, id string, session *mgo.Session) error {
-	c := session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
+func (r *RepositoryImpl) delete(ctx context.Context, id string) error {
+	c := r.session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
 	err := c.Remove(bson.M{studentID: id})
 	if err != nil {
 		return err

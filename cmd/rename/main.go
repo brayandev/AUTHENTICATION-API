@@ -22,13 +22,15 @@ func main() {
 	if dbErr != nil {
 		logger.Error("failed on database start", zap.NamedError("error", dbErr))
 	}
+
 	repository := student.NewRepository(db)
 	service := student.NewService(repository)
 
-	handler, hErr := createServerHandler(service, logger, db)
+	handler, hErr := createServerHandler(service, logger)
 	if hErr != nil {
 		logger.Error("failed on server start", zap.NamedError("error", hErr))
 	}
+
 	http.ListenAndServe(":8080", handler)
 }
 
