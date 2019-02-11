@@ -12,9 +12,9 @@ import (
 // Repository is repository ...
 type Repository interface {
 	authentication(Login, Password string) error
-	save(ctx context.Context, student Student) error
-	get(ctx context.Context, id string) (*Student, error)
-	delete(ctx context.Context, id string) error
+	save(ctx context.Context, student Student, session *mgo.Session) error
+	get(ctx context.Context, id string, session *mgo.Session) (*Student, error)
+	delete(ctx context.Context, id string, session *mgo.Session) error
 }
 
 // RepositoryImpl implements repository...
@@ -49,20 +49,12 @@ func NewMongoDB(endpoint string) (*mgo.Session, error) {
 	return mgoSession.Clone(), nil
 }
 
-func (r *RepositoryImpl) save(ctx context.Context, student Student) error {
-	session, err := NewMongoDB(os.Getenv("HOST_MONGODB"))
-	if err != nil {
-		return err
-	}
+func (r *RepositoryImpl) save(ctx context.Context, student Student, session *mgo.Session) error {
 	c := session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
 	return c.Insert(student)
 }
 
-func (r *RepositoryImpl) get(ctx context.Context, id string) (*Student, error) {
-	session, cErr := NewMongoDB(os.Getenv("HOST_MONGODB"))
-	if cErr != nil {
-		return nil, cErr
-	}
+func (r *RepositoryImpl) get(ctx context.Context, id string, session *mgo.Session) (*Student, error) {
 	c := session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
 	var student Student
 	err := c.Find(bson.M{"studentId": id}).One(&student)
@@ -72,11 +64,7 @@ func (r *RepositoryImpl) get(ctx context.Context, id string) (*Student, error) {
 	return &student, nil
 }
 
-func (r *RepositoryImpl) delete(ctx context.Context, id string) error {
-	session, cErr := NewMongoDB(os.Getenv("HOST_MONGODB"))
-	if cErr != nil {
-		return cErr
-	}
+func (r *RepositoryImpl) delete(ctx context.Context, id string, session *mgo.Session) error {
 	c := session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
 	err := c.Remove(bson.M{"studentId": id})
 	if err != nil {

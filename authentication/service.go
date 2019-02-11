@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/gofrs/uuid"
+	mgo "gopkg.in/mgo.v2"
 )
 
 // Service ...
 type Service interface {
-	SaveStudent(ctx context.Context, student Student) (string, error)
-	GetStudent(ctx context.Context, id string) (*Student, error)
-	DeleteStudent(ctx context.Context, id string) error
+	SaveStudent(ctx context.Context, student Student, session *mgo.Session) (string, error)
+	GetStudent(ctx context.Context, id string, session *mgo.Session) (*Student, error)
+	DeleteStudent(ctx context.Context, id string, session *mgo.Session) error
 }
 
 // ServiceImpl ...
@@ -24,13 +25,13 @@ func NewService(repository Repository) *ServiceImpl {
 }
 
 // SaveStudent ...
-func (s *ServiceImpl) SaveStudent(ctx context.Context, student Student) (string, error) {
+func (s *ServiceImpl) SaveStudent(ctx context.Context, student Student, session *mgo.Session) (string, error) {
 	studentID, err := uuid.NewV4()
 	if err != nil {
 		return "", err
 	}
 	student.ID = studentID.String()
-	err = s.repository.save(ctx, student)
+	err = s.repository.save(ctx, student, session)
 	if err != nil {
 		return "", err
 	}
@@ -39,11 +40,11 @@ func (s *ServiceImpl) SaveStudent(ctx context.Context, student Student) (string,
 }
 
 // GetStudent ...
-func (s *ServiceImpl) GetStudent(ctx context.Context, id string) (*Student, error) {
-	return s.repository.get(ctx, id)
+func (s *ServiceImpl) GetStudent(ctx context.Context, id string, session *mgo.Session) (*Student, error) {
+	return s.repository.get(ctx, id, session)
 }
 
 // DeleteStudent ...
-func (s *ServiceImpl) DeleteStudent(ctx context.Context, id string) error {
-	return s.repository.delete(ctx, id)
+func (s *ServiceImpl) DeleteStudent(ctx context.Context, id string, session *mgo.Session) error {
+	return s.repository.delete(ctx, id, session)
 }

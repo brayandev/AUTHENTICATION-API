@@ -1,6 +1,6 @@
 package authentication
 
-// Student is structure to persist a student...
+// Student is structure to persist a student.
 type Student struct {
 	ID       string `bson:"studentId" json:"studentId"`
 	Login    string `bson:"login" json:"login"`
@@ -9,7 +9,7 @@ type Student struct {
 	Email    string `bson:"email" json:"email"`
 }
 
-// Version ...
+// Version is student version.
 func (s *Student) Version() string {
 	return "vnd.authentication-student.student.v1"
 }

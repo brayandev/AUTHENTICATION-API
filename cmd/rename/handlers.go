@@ -8,20 +8,21 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	mgo "gopkg.in/mgo.v2"
 
 	"github.com/authentication-api/authentication"
 )
 
 type handlerFuncError func(w http.ResponseWriter, r *http.Request) error
 
-func saveStudent(service authentication.Service) handlerFuncError {
+func saveStudent(service authentication.Service, session *mgo.Session) handlerFuncError {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var student authentication.Student
 		err := json.NewDecoder(r.Body).Decode(&student)
 		if err != nil {
 			return err
 		}
-		studentID, err := service.SaveStudent(context.TODO(), student)
+		studentID, err := service.SaveStudent(context.TODO(), student, session)
 		if err != nil {
 			return err
 		}
@@ -29,10 +30,10 @@ func saveStudent(service authentication.Service) handlerFuncError {
 	}
 }
 
-func getStudent(service authentication.Service) handlerFuncError {
+func getStudent(service authentication.Service, session *mgo.Session) handlerFuncError {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		studentID := chi.URLParam(r, "studentID")
-		student, err := service.GetStudent(context.TODO(), studentID)
+		student, err := service.GetStudent(context.TODO(), studentID, session)
 		if err != nil {
 			return err
 		}
@@ -40,10 +41,10 @@ func getStudent(service authentication.Service) handlerFuncError {
 	}
 }
 
-func deleteStudent(service authentication.Service) handlerFuncError {
+func deleteStudent(service authentication.Service, session *mgo.Session) handlerFuncError {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		studentID := chi.URLParam(r, "studentID")
-		err := service.DeleteStudent(context.TODO(), studentID)
+		err := service.DeleteStudent(context.TODO(), studentID, session)
 		if err != nil {
 			return err
 		}

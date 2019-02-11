@@ -5,21 +5,16 @@ import (
 
 	"github.com/authentication-api/authentication"
 	"github.com/go-chi/chi"
+	"go.uber.org/zap"
+	mgo "gopkg.in/mgo.v2"
 )
 
-func createServerHandler() (http.Handler, error) {
-	config := authentication.NewConfig()
-	db, err := authentication.NewMongoDB(config.MongoDBCollection)
-	if err != nil {
-		return nil, err
-	}
-	repository := authentication.NewRepository(db)
-	service := authentication.NewService(repository)
+func createServerHandler(service authentication.Service, logger *zap.Logger, session *mgo.Session) (http.Handler, error) {
 	router := chi.NewRouter()
 	router.Route("/students", func(router chi.Router) {
-		router.Put("/", errorWrapper(saveStudent(service)))
-		router.Get("/{studentID}", errorWrapper(getStudent(service)))
-		router.Delete("/{studentID}", errorWrapper(deleteStudent(service)))
+		router.Put("/", errorWrapper(saveStudent(service, session)))
+		router.Get("/{studentID}", errorWrapper(getStudent(service, session)))
+		router.Delete("/{studentID}", errorWrapper(deleteStudent(service, session)))
 	})
 	return router, nil
 }
