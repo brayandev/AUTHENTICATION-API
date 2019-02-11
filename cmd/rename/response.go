@@ -10,5 +10,5 @@ type postStudentCreatedResponse struct {
 }
 
 func (pr *postStudentCreatedResponse) Version() string {
-	return "vnd.authentication-student.v1"
+	return "vnd.post-student.v1"
 }

@@ -1,4 +1,4 @@
-package authentication
+package student
 
 // Student is structure to persist a student.
 type Student struct {
@@ -11,5 +11,5 @@ type Student struct {
 
 // Version is student version.
 func (s *Student) Version() string {
-	return "vnd.authentication-student.student.v1"
+	return "vnd.student.student.v1"
 }

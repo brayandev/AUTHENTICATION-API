@@ -4,14 +4,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/authentication-api/authentication"
-
+	"github.com/student-api/student"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 func main() {
-	config := authentication.NewConfig()
+	config := student.NewConfig()
 
 	logger, zErr := configLog(zap.NewAtomicLevelAt(config.LogLevel.Value)).Build()
 	if zErr != nil {
@@ -19,12 +18,12 @@ func main() {
 	}
 	defer logger.Sync()
 
-	db, dbErr := authentication.NewMongoDB(config.MongoDBEndpoint)
+	db, dbErr := student.NewMongoDB(config.MongoDBEndpoint)
 	if dbErr != nil {
 		logger.Error("failed on database start", zap.NamedError("error", dbErr))
 	}
-	repository := authentication.NewRepository(db)
-	service := authentication.NewService(repository)
+	repository := student.NewRepository(db)
+	service := student.NewService(repository)
 
 	handler, hErr := createServerHandler(service, logger, db)
 	if hErr != nil {
