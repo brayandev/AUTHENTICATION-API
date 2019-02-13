@@ -77,6 +77,15 @@ func (r *RepositoryImpl) delete(ctx context.Context, id string) error {
 	return nil
 }
 
+func (r *RepositoryImpl) update(ctx context.Context, id string) error {
+	c := r.session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
+	student, gErr := r.get(ctx, id)
+	if gErr != nil {
+		return gErr
+	}
+	return c.Update(student.ID, student)
+}
+
 // Authentication ...
 func (r *RepositoryImpl) authentication(Login, Password string) error {
 	return nil
