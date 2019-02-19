@@ -6,8 +6,7 @@ type Versionable interface {
 }
 
 type postStudentCreatedResponse struct {
-	ID    string `json:"studentId"`
-	Login string `json:"login"`
+	ID string `json:"studentId"`
 }
 
 func (pr *postStudentCreatedResponse) Version() string {

@@ -25,7 +25,7 @@ func saveStudent(service student.Service) handlerFuncError {
 		if err != nil {
 			return err
 		}
-		return responseWriter(w, http.StatusCreated, &postStudentCreatedResponse{studentID, student.Login})
+		return responseWriter(w, http.StatusCreated, &postStudentCreatedResponse{studentID})
 	}
 }
 
