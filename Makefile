@@ -36,7 +36,7 @@ usage: Makefile
 build: build-student-api
 
 ## build-student-api: build student api.
-build-student-api: 
+build-student-api: lint test
 	@echo $(ECHOFLAGS) "$(OK_COLOR)==> Building binary... (linux/$(BUILDARCH)/$(BIN_API_STUDENT))...$(NO_COLOR)"
 	@echo $(ECHOFLAGS) $(ENVFLAGS) GOOS=linux GOARCH=$(BUILDARCH) $(GO) build $(BUILDFLAGS) -o bin/linux/amd64/$(BIN_API_STUDENT) ./cmd/rename
 	@$(ENVFLAGS) GOOS=linux GOARCH=$(BUILDARCH) $(GO) build $(BUILDFLAGS) -o bin/linux_amd64/$(BIN_API_STUDENT) ./cmd/rename
