@@ -2,6 +2,7 @@ package student
 
 import (
 	"context"
+	"time"
 
 	"github.com/gofrs/uuid"
 )
@@ -11,6 +12,7 @@ type Service interface {
 	SaveStudent(ctx context.Context, student Student) (string, error)
 	GetStudent(ctx context.Context, id string) (*Student, error)
 	DeleteStudent(ctx context.Context, id string) error
+	UpdateStudent(ctx context.Context, id string, student *UpdateStudent) (*UpdateStudentResult, error)
 }
 
 // ServiceImpl ...
@@ -29,7 +31,10 @@ func (s *ServiceImpl) SaveStudent(ctx context.Context, student Student) (string,
 	if err != nil {
 		return "", err
 	}
+
 	student.ID = studentID.String()
+	student.Creation = time.Now().UTC()
+
 	err = s.repository.save(ctx, student)
 	if err != nil {
 		return "", err
@@ -46,4 +51,26 @@ func (s *ServiceImpl) GetStudent(ctx context.Context, id string) (*Student, erro
 // DeleteStudent ...
 func (s *ServiceImpl) DeleteStudent(ctx context.Context, id string) error {
 	return s.repository.delete(ctx, id)
+}
+
+// UpdateStudent ...
+func (s *ServiceImpl) UpdateStudent(ctx context.Context, id string, student *UpdateStudent) (*UpdateStudentResult, error) {
+	currentStudent, err := s.repository.get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	currentStudent.Name = student.Name
+	currentStudent.Email = student.Email
+	currentStudent.Login = student.Login
+	currentStudent.Password = student.Password
+
+	uErr := s.repository.update(ctx, currentStudent)
+	if uErr != nil {
+		return nil, uErr
+	}
+
+	return &UpdateStudentResult{
+		ID: currentStudent.ID,
+	}, nil
 }

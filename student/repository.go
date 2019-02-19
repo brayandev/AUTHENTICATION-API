@@ -19,6 +19,7 @@ type Repository interface {
 	save(ctx context.Context, student Student) error
 	get(ctx context.Context, id string) (*Student, error)
 	delete(ctx context.Context, id string) error
+	update(ctx context.Context, student *Student) error
 }
 
 // RepositoryImpl implements repository...
@@ -77,13 +78,9 @@ func (r *RepositoryImpl) delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (r *RepositoryImpl) update(ctx context.Context, id string) error {
+func (r *RepositoryImpl) update(ctx context.Context, student *Student) error {
 	c := r.session.DB(os.Getenv("MONGO_DB_NAME")).C(os.Getenv("MOND_DB_COLLECTION"))
-	student, gErr := r.get(ctx, id)
-	if gErr != nil {
-		return gErr
-	}
-	return c.Update(student.ID, student)
+	return c.Update(bson.M{studentID: student.ID}, bson.M{"$set": student})
 }
 
 // Authentication ...

@@ -14,6 +14,7 @@ func createServerHandler(service student.Service, logger *zap.Logger) (http.Hand
 		router.Put("/", errorWrapper(saveStudent(service)))
 		router.Get("/{studentId}", errorWrapper(getStudent(service)))
 		router.Delete("/{studentId}", errorWrapper(deleteStudent(service)))
+		router.Patch("/{studentId}", errorWrapper(updateStudent(service)))
 	})
 	return router, nil
 }

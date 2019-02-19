@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 
@@ -24,7 +25,7 @@ func saveStudent(service student.Service) handlerFuncError {
 		if err != nil {
 			return err
 		}
-		return responseWriter(w, http.StatusCreated, &postStudentCreatedResponse{studentID})
+		return responseWriter(w, http.StatusCreated, &postStudentCreatedResponse{studentID, student.Login})
 	}
 }
 
@@ -47,6 +48,24 @@ func deleteStudent(service student.Service) handlerFuncError {
 			return err
 		}
 		return responseWriter(w, http.StatusNoContent, nil)
+	}
+}
+
+func updateStudent(service student.Service) handlerFuncError {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		studentID := chi.URLParam(r, "studentId")
+		var student *student.UpdateStudent
+
+		dErr := parseJSON(r.Body, &student)
+		if dErr != nil {
+			return dErr
+		}
+
+		updateResult, uErr := service.UpdateStudent(context.TODO(), studentID, student)
+		if uErr != nil {
+			return uErr
+		}
+		return responseWriter(w, http.StatusOK, updateResult)
 	}
 }
 
@@ -78,4 +97,12 @@ func errorWrapper(fn handlerFuncError) func(http.ResponseWriter, *http.Request) 
 			log.Println(err)
 		}
 	}
+}
+
+func parseJSON(reader io.ReadCloser, out interface{}) error {
+	err := json.NewDecoder(reader).Decode(out)
+	if err != nil {
+		return err
+	}
+	return nil
 }
