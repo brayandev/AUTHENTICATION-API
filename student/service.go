@@ -54,16 +54,17 @@ func (s *ServiceImpl) DeleteStudent(ctx context.Context, id string) error {
 }
 
 // UpdateStudent ...
-func (s *ServiceImpl) UpdateStudent(ctx context.Context, id string, student *UpdateStudent) (*UpdateStudentResult, error) {
+func (s *ServiceImpl) UpdateStudent(ctx context.Context, id string, updateStudent *UpdateStudent) (*UpdateStudentResult, error) {
 	currentStudent, err := s.repository.get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	currentStudent.Name = student.Name
-	currentStudent.Email = student.Email
-	currentStudent.Login = student.Login
-	currentStudent.Password = student.Password
+	currentStudent.Name = updateStudent.Name
+	currentStudent.Email = updateStudent.Email
+	currentStudent.Login = updateStudent.Login
+	currentStudent.Password = updateStudent.Password
+	currentStudent.LastUpdate = time.Now().UTC()
 
 	uErr := s.repository.update(ctx, currentStudent)
 	if uErr != nil {
