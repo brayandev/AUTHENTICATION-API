@@ -23,7 +23,7 @@ func main() {
 		logger.Error("failed on database start", zap.NamedError("error", dbErr))
 	}
 
-	repository := student.NewRepository(db)
+	repository := student.NewRepository(db, config.MongoDBName, config.MongoDBCollection)
 	service := student.NewService(repository)
 
 	handler, hErr := createServerHandler(service, logger)
