@@ -4,19 +4,19 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi"
-
-	"github.com/authentication-api/authentication"
+	"github.com/student-api/student"
 )
 
 type handlerFuncError func(w http.ResponseWriter, r *http.Request) error
 
-func addNewStudent(service authentication.Service) handlerFuncError {
+func saveStudent(service student.Service) handlerFuncError {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		var student authentication.Student
+		var student student.Student
 		err := json.NewDecoder(r.Body).Decode(&student)
 		if err != nil {
 			return err
@@ -29,9 +29,9 @@ func addNewStudent(service authentication.Service) handlerFuncError {
 	}
 }
 
-func getStudent(service authentication.Service) handlerFuncError {
+func getStudent(service student.Service) handlerFuncError {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		studentID := chi.URLParam(r, "studentID")
+		studentID := chi.URLParam(r, "studentId")
 		student, err := service.GetStudent(context.TODO(), studentID)
 		if err != nil {
 			return err
@@ -40,16 +40,34 @@ func getStudent(service authentication.Service) handlerFuncError {
 	}
 }
 
-// func deleteStudent(service authentication.Service) handlerFuncError {
-// 	return func(w http.ResponseWriter, r *http.Request) error {
-// 		studentID := chi.URLParam(r, "studentID")
-// 		err := service.DeleteStudent(context.TODO(), studentID)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		return responseWriter(w, http.StatusNoContent, nil)
-// 	}
-// }
+func deleteStudent(service student.Service) handlerFuncError {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		studentID := chi.URLParam(r, "studentId")
+		err := service.DeleteStudent(context.TODO(), studentID)
+		if err != nil {
+			return err
+		}
+		return responseWriter(w, http.StatusNoContent, nil)
+	}
+}
+
+func updateStudent(service student.Service) handlerFuncError {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		studentID := chi.URLParam(r, "studentId")
+		var student *student.UpdateStudent
+
+		dErr := parseJSON(r.Body, &student)
+		if dErr != nil {
+			return dErr
+		}
+
+		updateResult, uErr := service.UpdateStudent(context.TODO(), studentID, student)
+		if uErr != nil {
+			return uErr
+		}
+		return responseWriter(w, http.StatusOK, updateResult)
+	}
+}
 
 func responseWriter(w http.ResponseWriter, code int, content Versionable) error {
 	if content == nil {
@@ -79,4 +97,12 @@ func errorWrapper(fn handlerFuncError) func(http.ResponseWriter, *http.Request) 
 			log.Println(err)
 		}
 	}
+}
+
+func parseJSON(reader io.ReadCloser, out interface{}) error {
+	err := json.NewDecoder(reader).Decode(out)
+	if err != nil {
+		return err
+	}
+	return nil
 }

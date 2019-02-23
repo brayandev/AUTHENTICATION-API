@@ -1,4 +1,4 @@
-.PHONY: usage build build-authentication-api test get-linter lint
+.PHONY: usage build build-student-api test get-linter lint
 
 OK_COLOR=\033[32;01m
 NO_COLOR=\033[0m
@@ -23,7 +23,7 @@ ENVFLAGS ?= CGO_ENABLED=0
 BUILDFLAGS ?= -a -installsuffix cgo $(GOFLAGS)
 BUILDENV ?= GOOS=$(BUILDOS) GOARCH=$(BUILDARCH)
 
-BIN_API_AUTHENTICATION := api-authentication
+BIN_API_STUDENT := student-api
 
 usage: Makefile
 	@echo $(ECHOFLAGS) "to use make call:"
@@ -33,13 +33,13 @@ usage: Makefile
 	@sed -n 's/^##//p' $< | column -t -s ':' | sed -e 's/^/ /'
 
 ## build: build all.
-build: build-authentication-api
+build: build-student-api
 
-## build-authentication-api: build authentication api.
-build-authentication-api: 
-	@echo $(ECHOFLAGS) "$(OK_COLOR)==> Building binary... (linux/$(BUILDARCH)/$(BIN_API_AUTHENTICATION))...$(NO_COLOR)"
-	@echo $(ECHOFLAGS) $(ENVFLAGS) GOOS=linux GOARCH=$(BUILDARCH) $(GO) build $(BUILDFLAGS) -o bin/linux/amd64/$(BIN_API_AUTHENTICATION) ./cmd/rename
-	@$(ENVFLAGS) GOOS=linux GOARCH=$(BUILDARCH) $(GO) build $(BUILDFLAGS) -o bin/linux_amd64/$(BIN_API_AUTHENTICATION) ./cmd/rename
+## build-student-api: build student api.
+build-student-api: lint test
+	@echo $(ECHOFLAGS) "$(OK_COLOR)==> Building binary... (linux/$(BUILDARCH)/$(BIN_API_STUDENT))...$(NO_COLOR)"
+	@echo $(ECHOFLAGS) $(ENVFLAGS) GOOS=linux GOARCH=$(BUILDARCH) $(GO) build $(BUILDFLAGS) -o bin/linux/amd64/$(BIN_API_STUDENT) ./cmd/rename
+	@$(ENVFLAGS) GOOS=linux GOARCH=$(BUILDARCH) $(GO) build $(BUILDFLAGS) -o bin/linux_amd64/$(BIN_API_STUDENT) ./cmd/rename
 
 ## test: run unit tests
 test: 

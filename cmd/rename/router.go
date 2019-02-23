@@ -3,22 +3,18 @@ package main
 import (
 	"net/http"
 
-	"github.com/authentication-api/authentication"
 	"github.com/go-chi/chi"
+	"github.com/student-api/student"
+	"go.uber.org/zap"
 )
 
-func createServerHandler() (http.Handler, error) {
-	config := authentication.NewConfig()
-	db, err := authentication.NewMongoDB(config.MongoDBCollection)
-	if err != nil {
-		return nil, err
-	}
-	repository := authentication.NewRepository(db)
-	service := authentication.NewService(repository)
+func createServerHandler(service student.Service, logger *zap.Logger) (http.Handler, error) {
 	router := chi.NewRouter()
 	router.Route("/students", func(router chi.Router) {
-		router.Put("/", errorWrapper(addNewStudent(service)))
-		router.Get("/{studentID}", errorWrapper(getStudent(service)))
+		router.Put("/", errorWrapper(saveStudent(service)))
+		router.Get("/{studentId}", errorWrapper(getStudent(service)))
+		router.Delete("/{studentId}", errorWrapper(deleteStudent(service)))
+		router.Patch("/{studentId}", errorWrapper(updateStudent(service)))
 	})
 	return router, nil
 }
